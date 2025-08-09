@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kirim Pesan Anonim</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #4b6cb7, #182848);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+      animation: fadeIn 1s ease;
+      position: relative;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    p {
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 20px;
+      opacity: 0.8;
+    }
+    textarea {
+      width: 100%;
+      padding: 15px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      resize: none;
+      font-size: 1rem;
+      font-family: inherit;
+      margin-bottom: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      transition: 0.2s;
+    }
+    textarea:focus {
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 0 2px #4b6cb7;
+    }
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #ff512f, #dd2476);
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .notif {
+      position: absolute;
+      top: -70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    .notif.show {
+      opacity: 1;
+      pointer-events: auto;
+      top: -50px;
+    }
+    .notif button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="notif" class="notif">
+      <span id="notifMsg"></span>
+      <button onclick="closeNotif()">✖</button>
+    </div>
+    <h1>💌 Kirim Pesan Anonim</h1>
+    <p>Tulis pesanmu di bawah. Identitasmu akan dirahasiakan.</p>
+    <form id="anonForm">
+      <textarea id="message" placeholder="Tulis sesuatu..." rows="5" required></textarea>
+      <button type="submit">Kirim 🚀</button>
+    </form>
+  </div>
+
+  <script>
+    function showNotif(msg) {
+      const notif = document.getElementById('notif');
+      const notifMsg = document.getElementById('notifMsg');
+      notifMsg.textContent = msg;
+      notif.classList.add('show');
+    }
+
+    function closeNotif() {
+      document.getElementById('notif').classList.remove('show');
+    }
+
+    document.getElementById('anonForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = document.getElementById('message').value.trim();
+      if (!message) {
+        showNotif('Pesan tidak boleh kosong!');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+
+        if (res.ok) {
+          showNotif('Pesan terkirim!');
+          document.getElementById('message').value = '';
+        } else {
+          showNotif('Gagal mengirim pesan.');
+        }
+      } catch (err) {
+        showNotif('Terjadi kesalahan, coba lagi.');
+      }
+    });
+  </script>
+</body>
+</html>
